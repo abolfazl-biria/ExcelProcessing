@@ -15,6 +15,7 @@ var configuration = builder.Configuration;
 
 services
     .AddConfiguredDatabase(configuration)
+    .AddServices()
     .AddConfiguredSwagger();
 
 services.AddControllers();
