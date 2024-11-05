@@ -1,32 +1,38 @@
 using EndPoint.Api.Extensions.DependencyInjection;
+using EndPoint.Api.Extensions.Middleware;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+
+builder.Host.UseSerilog().ConfigureLogging(loggingConfiguration => loggingConfiguration.ClearProviders());
 
 var services = builder.Services;
 var configuration = builder.Configuration;
 
-// Add services to the container.
-
 services
-    .AddConfiguredDatabase(configuration);
+    .AddConfiguredDatabase(configuration)
+    .AddConfiguredSwagger();
 
 services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 services.AddEndpointsApiExplorer();
-services.AddSwaggerGen();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    app.UseConfiguredSwagger();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseConfiguredExceptionHandler(builder.Environment);
 
 app.MapControllers();
 
