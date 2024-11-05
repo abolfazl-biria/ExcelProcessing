@@ -19,6 +19,7 @@ public static class DataBaseInjection
                         providerOptions.CommandTimeout(int.MaxValue); //Timeout in seconds
                     }));
 
+        services.AddScoped<IDapperContext>(_ => new DapperContext(defaultConnection));
         services.AddScoped<IDataBaseContext, DataBaseContext>();
 
         return services;
